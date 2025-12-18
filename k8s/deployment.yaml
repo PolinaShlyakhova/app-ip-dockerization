@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ip-app-deployment
+  labels:
+    app: ip-app
+spec:
+  replicas: 3  # Три копии приложения для отказоустойчивости
+  selector:
+    matchLabels:
+      app: ip-app
+  template:
+    metadata:
+      labels:
+        app: ip-app
+    spec:
+      containers:
+      - name: web-server
+        image: nginx:alpine  # Легковесный веб-сервер
+        ports:
+        - containerPort: 80  # Контейнер слушает порт 80
+        volumeMounts:
+        - name: app-files
+          mountPath: /usr/share/nginx/html  # Куда монтируем файлы
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+      volumes:
+      - name: app-files
+        configMap:
+          name: ip-app-config  # Используем ConfigMap с файлами

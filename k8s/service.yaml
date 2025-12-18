@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ip-app-service
+  labels:
+    app: ip-app
+spec:
+  selector:
+    app: ip-app  # Связываем с подами из Deployment
+  ports:
+  - port: 80        # Порт сервиса внутри кластера
+    targetPort: 80  # Порт контейнера
+    protocol: TCP
+  type: ClusterIP   # Внутренний IP 

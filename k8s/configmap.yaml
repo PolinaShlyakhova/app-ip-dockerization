@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ip-app-config
+data:
+  # index.html - главная страница
+  index.html: |
+    <!DOCTYPE html>
+    <html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Лабораторная №1 - Получение IP</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="container">
+            <h1>Лабораторная работа №1</h1>
+            <p class="subtitle">Получение IP-адреса через API</p>
+            
+            <div class="api-selector">
+                <h3>Выберите API:</h3>
+                <label>
+                    <input type="radio" name="api" value="ip-api" checked>
+                    <span>ip-api.com</span>
+                </label>
+                <label>
+                    <input type="radio" name="api" value="jsonip">
+                    <span>jsonip.com</span>
+                </label>
+            </div>
+            
+            <button onclick="getIP()" class="btn">Получить IP</button>
+            
+            <div class="result">
+                <h3>Результат:</h3>
+                <pre id="output">{"myIP": "нажмите кнопку"}</pre>
+            </div>
+        </div>
+        
+        <script src="script.js"></script>
+    </body>
+    </html>
+
+  # style.css - стили
+  style.css: |
+    body {
+        font-family: Arial, sans-serif;
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    .container {
+        border: 1px solid #ccc;
+        padding: 20px;
+        border-radius: 5px;
+    }
+    .btn {
+        padding: 10px 20px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 10px 0;
+    }
+    pre {
+        background: #f5f5f5;
+        padding: 10px;
+        border-radius: 5px;
+        overflow-x: auto;
+    }
+
+  # script.js - логика приложения
+  script.js: |
+    function getIP() {
+        const output = document.getElementById('output');
+        const apiType = document.querySelector('input[name="api"]:checked').value;
+        
+        output.textContent = '{"myIP": "загрузка..."}';
+        
+        if (apiType === 'ip-api') {
+            fetch('http://ip-api.com/json/')
+                .then(r => r.json())
+                .then(data => {
+                    output.textContent = JSON.stringify({myIP: data.query}, null, 2);
+                })
+                .catch(() => {
+                    output.textContent = JSON.stringify({myIP: null}, null, 2);
+                });
+        } else {
+            window.handleJSONP = function(data) {
+                const result = { myIP: data.ip };
+                output.textContent = JSON.stringify(result, null, 2);
+                document.getElementById('jsonp-script')?.remove();
+            };
+            
+            const script = document.createElement('script');
+            script.id = 'jsonp-script';
+            script.src = 'https://jsonip.com/?callback=handleJSONP';
+            document.body.appendChild(script);
+        }
+    }
+    
