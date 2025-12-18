@@ -1,4 +1,4 @@
-# Лабораторная №2
+# Лабораторная работа №3
 
 Создание кластера Kind
 
@@ -17,6 +17,7 @@ kubectl get all
 kubectl port-forward service/ip-app-service 8080:80
 
 Открыть http://localhost:8080
+
 
 
 
